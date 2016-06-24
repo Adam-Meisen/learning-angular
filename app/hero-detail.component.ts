@@ -24,4 +24,8 @@ export class HeroDetailComponent implements OnInit {
     this.heroService.getHero(id)
       .then(hero => this.hero = hero);
   }
+
+  goBack() {
+    window.history.back();
+  }
 }

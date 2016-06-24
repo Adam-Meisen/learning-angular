@@ -13,8 +13,4 @@ export class HeroService {
         hero => hero.id === id
       )[0]);
   }
-
-  goBack() {
-    window.history.back();
-  }
 }
