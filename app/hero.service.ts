@@ -41,7 +41,7 @@ export class HeroService {
                .catch(this.handleError);
   }
 
-  private delete(hero: Hero) {
+  delete(hero: Hero) {
     let headers = new Headers;
     headers.append('Content-Type', 'application/json');
 
