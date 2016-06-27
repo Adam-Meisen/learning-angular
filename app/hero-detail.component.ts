@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { RouteParams } from '@angular/router-deprecated';
+import { Component, EventEmitter, Input, OnInit, OnDestroy, Output } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
+import { APP_ROUTER_PROVIDERS } from './app.routes';
 import { Hero } from './hero';
 import { HeroService } from './hero.service';
 
@@ -10,38 +11,45 @@ import { HeroService } from './hero.service';
   styleUrls: ['app/hero-detail.component.css']
 })
 
-export class HeroDetailComponent implements OnInit {
+export class HeroDetailComponent implements OnInit, OnDestroy {
   @Input() hero: Hero;
   @Output() close = new EventEmitter();
   error: any;
   navigated = false; //true if navigated here
+  private sub: any;
 
   constructor(
     private heroService: HeroService,
-    private routeParams: RouteParams) {
+    private route: ActivatedRoute) {
 
   }
 
   ngOnInit() {
-    if (this.routeParams.get('id') !== null) {
-      let id = +this.routeParams.get('id');
-      this.navigated = true;
-      this.heroService.getHero(id)
+    this.sub = this.route.params.subscribe(params => {
+      let id = +params['id'];
+      if (id !== null) {
+        this.navigated = true;
+        this.heroService.getHero(id)
           .then(hero => this.hero = hero);
-    } else {
-      this.navigated = false;
-      this.hero = new Hero();
-    }
+      } else {
+        this.navigated = false;
+        this.hero = new Hero();
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe;
   }
 
   save() {
     this.heroService
-        .save(this.hero)
-        .then(hero => {
-          this.hero = hero; //saved hero, with id if new
-          this.goBack(hero);
-        })
-        .catch(error => this.error = error);
+      .save(this.hero)
+      .then(hero => {
+        this.hero = hero; //saved hero, with id if new
+        this.goBack(hero);
+      })
+      .catch(error => this.error = error);
   }
 
   goBack(savedHero: Hero = null) {
